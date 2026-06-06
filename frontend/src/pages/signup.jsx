@@ -17,7 +17,7 @@ export default function Signup() {
   const [form, setForm] = useState({
     firstName: '', lastName: '',
     email: '', phone: '',
-    role: '', country: '',
+    role: '', city: '', state: '', zip: '', country: '',
     password: '', confirmPassword: '',
     additionalInfo: '',
   })
@@ -79,6 +79,9 @@ export default function Signup() {
           contact_person: fullName,
           email: form.email,
           phone: form.phone,
+          city: form.city,
+          state: form.state,
+          pincode: form.zip,
           country: form.country,
           user_id: data.user.id,
           status: 'pending',
@@ -151,7 +154,32 @@ export default function Signup() {
           </div>
         </div>
 
-        {/* Row 3: Role + Country */}
+        {/* Row 3: City + State */}
+        <div className="field-row">
+          <div className="field-group">
+            <label className="field-label" htmlFor="city">City</label>
+            <input id="city" name="city" type="text" className="field-input bare" placeholder="Mumbai" value={form.city} onChange={handleChange} />
+          </div>
+          <div className="field-group">
+            <label className="field-label" htmlFor="state">State</label>
+            <input id="state" name="state" type="text" className="field-input bare" placeholder="Maharashtra" value={form.state} onChange={handleChange} />
+          </div>
+        </div>
+
+        {/* Row 4: Zip + Country */}
+        <div className="field-row">
+          <div className="field-group">
+            <label className="field-label" htmlFor="zip">Zip</label>
+            <input id="zip" name="zip" type="text" className="field-input bare" placeholder="400001" value={form.zip} onChange={handleChange} />
+          </div>
+          <div className="field-group">
+            <label className="field-label" htmlFor="country">Country</label>
+            <input id="country" name="country" type="text" className={`field-input bare${errors.country ? ' err' : ''}`} placeholder="India" value={form.country} onChange={handleChange} />
+            {errors.country && <span className="field-error">{errors.country}</span>}
+          </div>
+        </div>
+
+        {/* Row 5: Role */}
         <div className="field-row">
           <div className="field-group">
             <label className="field-label" htmlFor="role">Role</label>
@@ -166,19 +194,9 @@ export default function Signup() {
             </select>
             {errors.role && <span className="field-error">{errors.role}</span>}
           </div>
-          <div className="field-group">
-            <label className="field-label" htmlFor="country">Country</label>
-            <input
-              id="country" name="country" type="text"
-              className={`field-input bare${errors.country ? ' err' : ''}`}
-              placeholder="India"
-              value={form.country} onChange={handleChange}
-            />
-            {errors.country && <span className="field-error">{errors.country}</span>}
-          </div>
         </div>
 
-        {/* Row 4: Password + Confirm */}
+        {/* Row 6: Password + Confirm */}
         <div className="field-row">
           <div className="field-group">
             <label className="field-label" htmlFor="password">Password</label>

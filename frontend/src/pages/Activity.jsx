@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { formatDateTime } from '../lib/constants'
+import { formatDateTime, timeAgo } from '../lib/constants'
 import LoadingSpinner from '../components/LoadingSpinner'
 import EmptyState from '../components/EmptyState'
 
@@ -8,7 +8,7 @@ const TABS = [
   { id: 'all', label: 'All' },
   { id: 'rfq', label: 'RFQs' },
   { id: 'approval', label: 'Approvals' },
-  { id: 'finance', label: 'Finance' },
+  { id: 'finance', label: 'Invoices' },
 ]
 
 const FINANCE_TYPES = ['purchase_order', 'invoice']
@@ -42,8 +42,8 @@ export default function Activity() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Activity</h1>
-          <p className="page-subtitle">Audit trail of procurement actions</p>
+          <h1 className="page-title">Activity & Logs</h1>
+          <p className="page-subtitle">Procurement audit trail</p>
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export default function Activity() {
               <div className="activity-content">
                 <div className="activity-header">
                   <strong>{log.profiles?.full_name || 'System'}</strong>
-                  <span className="activity-time">{formatDateTime(log.created_at)}</span>
+                  <span className="activity-time" title={formatDateTime(log.created_at)}>{timeAgo(log.created_at)}</span>
                 </div>
                 <p>{log.description || log.action}</p>
                 <span className="activity-meta">

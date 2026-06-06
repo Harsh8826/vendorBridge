@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { WRITE_ROLES, formatCurrency, formatDate, formatDateTime } from '../lib/constants'
 import StatusBadge from '../components/StatusBadge'
@@ -39,17 +40,19 @@ export default function InvoiceDetail() {
 
   async function sendInvoice() {
     setActionLoading(true)
-    const { error: err } = await supabase
-      .from('invoices')
-      .update({
-        status: 'sent',
-        sent_at: new Date().toISOString(),
-        sent_to_email: invoice.vendors?.email,
-      })
-      .eq('id', id)
+    setError('')
+    try {
+      await api.emailInvoice(id, invoice.vendors?.email)
+      load()
+    } catch (err) {
+      const { error: fallbackErr } = await supabase
+        .from('invoices')
+        .update({ status: 'sent', sent_at: new Date().toISOString(), sent_to_email: invoice.vendors?.email })
+        .eq('id', id)
+      if (fallbackErr) setError(err.message)
+      else load()
+    }
     setActionLoading(false)
-    if (err) setError(err.message)
-    else load()
   }
 
   async function markPaid() {

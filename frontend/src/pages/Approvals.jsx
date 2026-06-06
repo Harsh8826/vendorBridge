@@ -110,6 +110,7 @@ export default function Approvals() {
                   <td><StatusBadge status={a.status} /></td>
                   <td>{formatDateTime(a.requested_at)}</td>
                   <td className="actions">
+                    <Link to={`/approvals/${a.id}`} className="btn btn-secondary btn-sm">View</Link>
                     {a.status === 'pending' && a.approver_id === user.id && (
                       <>
                         <button type="button" className="btn btn-success btn-sm" onClick={() => setActionModal({ ...a, action: 'approved' })}>

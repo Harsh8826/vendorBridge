@@ -14,6 +14,8 @@ import QuotationCompare from './pages/QuotationCompare'
 import Quotations from './pages/Quotations'
 import QuotationDetail from './pages/QuotationDetail'
 import Approvals from './pages/Approvals'
+import ApprovalDetail from './pages/ApprovalDetail'
+import POInvoice from './pages/POInvoice'
 import PurchaseOrders from './pages/PurchaseOrders'
 import PODetail from './pages/PODetail'
 import Invoices from './pages/Invoices'
@@ -66,9 +68,11 @@ export default function App() {
             <Route path="/quotations/:id" element={<QuotationDetail />} />
 
             <Route path="/approvals" element={<Approvals />} />
+            <Route path="/approvals/:id" element={<ApprovalDetail />} />
 
             <Route path="/purchase-orders" element={<PurchaseOrders />} />
             <Route path="/purchase-orders/:id" element={<PODetail />} />
+            <Route path="/purchase-orders/:id/documents" element={<POInvoice />} />
 
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/:id" element={<InvoiceDetail />} />

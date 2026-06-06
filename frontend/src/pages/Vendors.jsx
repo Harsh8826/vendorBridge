@@ -19,6 +19,8 @@ export default function Vendors() {
   const [vendors, setVendors] = useState([])
   const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
+  const [statusTab, setStatusTab] = useState('all')
+  const [viewVendor, setViewVendor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(EMPTY_VENDOR)
@@ -98,12 +100,14 @@ export default function Vendors() {
   }
 
   const filtered = vendors.filter((v) => {
+    if (statusTab !== 'all' && v.status !== statusTab) return false
     const q = search.toLowerCase()
     if (!q) return true
     return (
       v.company_name?.toLowerCase().includes(q) ||
       v.vendor_categories?.name?.toLowerCase().includes(q) ||
-      v.email?.toLowerCase().includes(q)
+      v.email?.toLowerCase().includes(q) ||
+      v.contact_person?.toLowerCase().includes(q)
     )
   })
 
@@ -121,14 +125,20 @@ export default function Vendors() {
         )}
       </div>
 
-      <div style={{ marginBottom: '1.25rem' }}>
+      <div className="vendors-toolbar">
         <input
           type="search"
-          placeholder="Search vendors by name or category..."
+          placeholder="Search vendors by name, category..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ width: '100%', maxWidth: 400 }}
         />
+        <div className="tab-bar">
+          {['all', 'active', 'pending', 'inactive'].map((s) => (
+            <button key={s} type="button" className={`tab-btn${statusTab === s ? ' active' : ''}`} onClick={() => setStatusTab(s)}>
+              {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -154,7 +164,7 @@ export default function Vendors() {
                 <th>Category</th>
                 <th>Status</th>
                 <th>Rating</th>
-                {canWrite && <th>Actions</th>}
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -168,8 +178,10 @@ export default function Vendors() {
                   <td>{v.vendor_categories?.name || '—'}</td>
                   <td><StatusBadge status={v.status} /></td>
                   <td>{v.rating ? `${v.rating}/5` : '—'}</td>
-                  {canWrite && (
-                    <td className="actions">
+                  <td className="actions">
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setViewVendor(v)}>View</button>
+                    {canWrite && (
+                      <>
                       <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(v)}>
                         Edit
                       </button>
@@ -183,14 +195,32 @@ export default function Vendors() {
                           Deactivate
                         </button>
                       )}
-                    </td>
-                  )}
+                      </>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+
+      <Modal open={!!viewVendor} onClose={() => setViewVendor(null)} title={viewVendor?.company_name || 'Vendor'} wide>
+        {viewVendor && (
+          <div className="detail-grid">
+            <div className="detail-card">
+              <div className="detail-row"><span className="label">Contact</span><span className="value">{viewVendor.contact_person}</span></div>
+              <div className="detail-row"><span className="label">Email</span><span className="value">{viewVendor.email}</span></div>
+              <div className="detail-row"><span className="label">Phone</span><span className="value">{viewVendor.phone || '—'}</span></div>
+              <div className="detail-row"><span className="label">Category</span><span className="value">{viewVendor.vendor_categories?.name || '—'}</span></div>
+              <div className="detail-row"><span className="label">Status</span><StatusBadge status={viewVendor.status} /></div>
+              <div className="detail-row"><span className="label">Rating</span><span className="value">{viewVendor.rating ? `${viewVendor.rating}/5` : '—'}</span></div>
+              <div className="detail-row"><span className="label">GST</span><span className="value">{viewVendor.gst_number || '—'}</span></div>
+              <div className="detail-row"><span className="label">Address</span><span className="value">{[viewVendor.address, viewVendor.city, viewVendor.state, viewVendor.pincode].filter(Boolean).join(', ') || '—'}</span></div>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Vendor' : 'Add Vendor'} wide>
         <form onSubmit={handleSave}>

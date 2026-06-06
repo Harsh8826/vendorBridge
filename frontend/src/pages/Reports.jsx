@@ -38,10 +38,10 @@ export default function Reports() {
   const maxVendorSpend = Math.max(...vendorPerf.map((v) => v.total_spend || 0), 1)
 
   const statCards = [
-    { label: 'Total Spend (30d)', value: formatCurrency(stats?.total_spend_30d), color: 'success' },
-    { label: 'Total RFQs', value: stats?.total_rfqs ?? 0 },
+    { label: 'Total Spend', value: formatCurrency(stats?.total_spend_30d), color: 'success' },
     { label: 'Active Vendors', value: stats?.total_vendors ?? 0 },
-    { label: 'Pending Invoices', value: stats?.pending_invoices ?? 0, color: 'warning' },
+    { label: 'Total RFQs', value: stats?.total_rfqs ?? 0 },
+    { label: 'Pending POs', value: stats?.recent_pos ?? 0, color: 'warning' },
   ]
 
   return (

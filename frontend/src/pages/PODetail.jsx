@@ -89,6 +89,9 @@ export default function PODetail() {
               Create Invoice
             </button>
           )}
+          <button type="button" className="btn btn-secondary" onClick={() => navigate(`/purchase-orders/${id}/documents`)}>
+            PO & Invoice
+          </button>
         </div>
       </div>
 
