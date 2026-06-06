@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
+import { supabase } from '../lib/supabase'
 import './Auth.css'
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const successMessage = location.state?.message
 
   function handleChange(e) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))
@@ -22,11 +25,16 @@ export default function Login() {
       return
     }
     setLoading(true)
-    // TODO: replace with Supabase auth
-    setTimeout(() => {
-      setLoading(false)
-      navigate('/dashboard')
-    }, 1200)
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: form.email,
+      password: form.password,
+    })
+    setLoading(false)
+    if (authError) {
+      setError(authError.message)
+      return
+    }
+    navigate('/dashboard')
   }
 
   return (
@@ -87,6 +95,10 @@ export default function Login() {
             </button>
           </div>
         </div>
+
+        {successMessage && (
+          <p className="form-success" style={{ margin: 0 }}>{successMessage}</p>
+        )}
 
         {/* Error */}
         {error && <p className="auth-error">{error}</p>}

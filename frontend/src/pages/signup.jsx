@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
+import { supabase } from '../lib/supabase'
 import './Auth.css'
 
 const ROLES = [
@@ -47,11 +48,46 @@ export default function Signup() {
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
     setLoading(true)
-    // TODO: replace with Supabase auth + profile insert
-    setTimeout(() => {
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`
+
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: {
+        data: {
+          full_name: fullName,
+          role: form.role,
+        },
+      },
+    })
+
+    if (authError) {
       setLoading(false)
-      navigate('/login')
-    }, 1400)
+      setErrors({ email: authError.message })
+      return
+    }
+
+    if (data.user) {
+      await supabase.from('profiles').update({
+        phone: form.phone,
+        full_name: fullName,
+      }).eq('id', data.user.id)
+
+      if (form.role === 'vendor') {
+        await supabase.from('vendors').insert({
+          company_name: form.additionalInfo || fullName,
+          contact_person: fullName,
+          email: form.email,
+          phone: form.phone,
+          country: form.country,
+          user_id: data.user.id,
+          status: 'pending',
+        })
+      }
+    }
+
+    setLoading(false)
+    navigate('/login', { state: { message: 'Account created! Please sign in.' } })
   }
 
   return (
